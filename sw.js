@@ -1,7 +1,7 @@
 // Service Worker for LiveTranslate PWA
 // Strategy: cache-first for app shell, network-only for translation API
 
-const CACHE     = 'livetranslate-v4';
+const CACHE     = 'livetranslate-v5';
 const APP_SHELL = ['/', '/index.html', '/style.css', '/app.js', '/manifest.json', '/icon.svg'];
 
 // ── Install: cache app shell ───────────────────────────────────────

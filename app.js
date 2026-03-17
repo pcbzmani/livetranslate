@@ -70,10 +70,11 @@ elTo.addEventListener('change',   saveLangs);
 // ── Speech Recognition ────────────────────────────────────
 // KEY: One instance, continuous:true — avoids Chrome "network" error on restart
 const API = window.SpeechRecognition || window.webkitSpeechRecognition;
-let rec       = null;
-let listening = false;
-let lastOut   = '';
-let lastLang  = '';
+let rec          = null;
+let listening    = false;
+let lastOut      = '';
+let lastLang     = '';
+let restartCount = 0;   // prevents infinite restart loop
 
 if (API) {
   rec                = new API();
@@ -82,6 +83,7 @@ if (API) {
   rec.maxAlternatives = 1;
 
   rec.onresult = (e) => {
+    restartCount = 0; // got audio — reset counter
     let interim = '';
     for (let i = e.resultIndex; i < e.results.length; i++) {
       if (e.results[i].isFinal) {
@@ -109,14 +111,22 @@ if (API) {
   };
 
   rec.onend = () => {
-    // continuous mode only fires onend on unexpected stops (network hiccup, etc.)
-    // Auto-restart if we're still supposed to be listening
-    if (listening) {
-      setTimeout(() => {
-        if (!listening) return;
-        try { rec.start(); } catch (_) {}
-      }, 300);
+    if (!listening) return;
+    restartCount++;
+    if (restartCount > 4) {
+      // Too many restarts without audio — give up and show error
+      listening = false;
+      restartCount = 0;
+      elMic.classList.remove('recording');
+      elInterim.textContent = '';
+      setStatus('Tap mic to speak');
+      showToast('Speech recognition unavailable. Check internet & mic permissions.', 'error');
+      return;
     }
+    setTimeout(() => {
+      if (!listening) return;
+      try { rec.start(); } catch (_) {}
+    }, 400);
   };
 } else {
   // No Speech API — show banner
