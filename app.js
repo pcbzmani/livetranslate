@@ -140,11 +140,12 @@ elMic.addEventListener('click', () => {
 });
 
 function startListening() {
-  rec.lang = LANGS.find(l => l.code === elFrom.value).speech;
+  const fromLang = LANGS.find(l => l.code === elFrom.value);
+  rec.lang = fromLang.speech;
   listening = true;
   elMic.classList.add('recording');
   elInterim.textContent = '';
-  setStatus('Listening…');
+  setStatus('Speak in ' + fromLang.name + '…');
   try { rec.start(); } catch (_) {
     // "already started" is fine in continuous mode — it's still running
   }
@@ -180,7 +181,7 @@ async function doTranslate(original) {
     elTranslated.textContent = translated;
     elBadge.textContent      = '→ ' + toLang.name;
     elCard.classList.remove('hidden');
-    setStatus('Listening…');   // keep status as listening since mic is still on
+    setStatus('Speak in ' + LANGS.find(l => l.code === elFrom.value).name + '…');
 
     lastOut  = translated;
     lastLang = toLang.speech;
