@@ -1,0 +1,19 @@
+{
+  "name": "LiveTranslate",
+  "short_name": "Translate",
+  "description": "Real-time two-way speech translator for face-to-face conversations. No data leaves your device.",
+  "start_url": "/",
+  "display": "standalone",
+  "orientation": "portrait",
+  "theme_color": "#2563eb",
+  "background_color": "#f1f5f9",
+  "lang": "en",
+  "icons": [
+    {
+      "src": "icon.svg",
+      "sizes": "any",
+      "type": "image/svg+xml",
+      "purpose": "any maskable"
+    }
+  ]
+}
