@@ -1,10 +1,13 @@
-// Service Worker for LiveTranslate PWA
-// Strategy: cache-first for app shell, network-only for translation API
+const CACHE     = 'livetranslate-v6';
+const APP_SHELL = [
+  '/livetranslate/',
+  '/livetranslate/index.html',
+  '/livetranslate/style.css',
+  '/livetranslate/app.js',
+  '/livetranslate/manifest.json',
+  '/livetranslate/icon.svg'
+];
 
-const CACHE     = 'livetranslate-v5';
-const APP_SHELL = ['/', '/index.html', '/style.css', '/app.js', '/manifest.json', '/icon.svg'];
-
-// ── Install: cache app shell ───────────────────────────────────────
 self.addEventListener('install', (event) => {
   event.waitUntil(
     caches.open(CACHE).then((cache) => cache.addAll(APP_SHELL))
@@ -12,7 +15,6 @@ self.addEventListener('install', (event) => {
   self.skipWaiting();
 });
 
-// ── Activate: remove old caches ───────────────────────────────────
 self.addEventListener('activate', (event) => {
   event.waitUntil(
     caches.keys().then((keys) =>
@@ -22,17 +24,9 @@ self.addEventListener('activate', (event) => {
   self.clients.claim();
 });
 
-// ── Fetch: network-only for API, cache-first for app shell ────────
 self.addEventListener('fetch', (event) => {
-  const url = event.request.url;
-
-  // Translation API — always use network (never cache)
-  if (url.includes('mymemory.translated.net')) return;
-
-  // App shell — cache first, fall back to network
+  if (event.request.url.includes('mymemory.translated.net')) return;
   event.respondWith(
-    caches.match(event.request).then(
-      (cached) => cached || fetch(event.request)
-    )
+    caches.match(event.request).then((cached) => cached || fetch(event.request))
   );
 });
